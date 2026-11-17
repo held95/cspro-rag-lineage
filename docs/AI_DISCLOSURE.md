@@ -1,8 +1,7 @@
 # AI assistance disclosure
 
 This project was built with **Claude Code** (an AI coding assistant) working in the author's repository, on top of an
-implementation plan (`docs/CSPRO_IMPLEMENTATION_PLAN.md`, `docs/CSPRO_24H_EXECUTION_PLAN.md`) and research notes
-(`docs/research/`).
+implementation plan and research notes (not included in this public repository).
 
 ## What the assistant did
 - Wrote or modified code and tests across `app/`, `tests/` and `finetune/`, ran the test suite, and committed the work

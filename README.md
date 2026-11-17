@@ -7,7 +7,7 @@ baseline-vs-adapted evaluation.
 
 Read `docs/LIMITATIONS.md` and `docs/AI_DISCLOSURE.md` before judging the results.
 `docs/WALKTHROUGH.md` maps every behaviour to a file, a test and a command; `docs/ARCHITECTURE.md` is the one-page design;
-`docs/LIVE_RUN.md` and `docs/RETRIEVAL_EVAL.md` hold the (small) real-model measurements; `docs/SUBMISSION_CHECKLIST.md` the recording script.
+`docs/LIVE_RUN.md` and `docs/RETRIEVAL_EVAL.md` hold the (small) real-model measurements.
 
 ## What is verified (and how)
 
@@ -64,7 +64,7 @@ that contradicts the current policy.
 
 ## Models and licences
 LLM `qwen3:4b-instruct-2507-q4_K_M` (fallback `qwen3:1.7b-q4_K_M`, also the fine-tune base `Qwen/Qwen3-1.7B`) and embedder
-`nomic-embed-text` run locally through Ollama. The research notes (`docs/research/`) list them as Apache-2.0, but that was
+`nomic-embed-text` run locally through Ollama. They were listed as Apache-2.0 during planning, but that was
 **not re-verified against the model cards**; check the licences before any reuse. Fine-tune pins: `requirements-train.txt`.
 
 ## Fine-tune (QLoRA, Qwen3-1.7B)
