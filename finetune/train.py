@@ -152,7 +152,7 @@ def run_training(cfg: dict, output_dir: Path, max_steps: int | None) -> dict:
         max_steps=max_steps if max_steps else -1,
         learning_rate=t["learning_rate"],
         lr_scheduler_type=t["lr_scheduler_type"],
-        warmup_ratio=t["warmup_ratio"],
+        warmup_steps=t["warmup_ratio"],  # transformers>=5: a float in [0,1) means "fraction of total steps"
         optim=t["optim"],
         seed=t["seed"],
         bf16=True,
@@ -169,9 +169,13 @@ def run_training(cfg: dict, output_dir: Path, max_steps: int | None) -> dict:
     trainer = SFTTrainer(model=model, args=args, train_dataset=Dataset.from_list(train_rows),
                          eval_dataset=Dataset.from_list(val_rows), processing_class=tokenizer,
                          peft_config=lora)
-    first_mask = trainer.train_dataset[0]["completion_mask"]
+    # TRL >= 1.x folds completion_mask into `labels` (-100 = no loss); count the tokens that DO train
+    first_labels = trainer.train_dataset[0]["labels"]
+    first_mask = [1 if tok != -100 else 0 for tok in first_labels]
     if sum(first_mask) == 0:
         raise RuntimeError("completion mask is all zeros: nothing would be trained")
+    if sum(first_mask) == len(first_mask):
+        raise RuntimeError("no prompt tokens are masked: loss would include the prompt (completion_only_loss off?)")
 
     torch.cuda.reset_peak_memory_stats()
     started = datetime.now(timezone.utc)

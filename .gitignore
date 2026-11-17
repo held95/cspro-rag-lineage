@@ -12,3 +12,4 @@ finetune/outputs/
 *.safetensors
 *.gguf
 .claude/
+finetune/outputs/
