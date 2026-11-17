@@ -1,0 +1,24 @@
+[project]
+name = "cspro-rag-lineage"
+version = "0.1.0"
+description = "Multi-tenant RAG service demonstrating stale-retry lineage failure and its fix (CSPRO assessment)"
+requires-python = ">=3.11,<3.13"
+
+[tool.setuptools.packages.find]
+include = ["app*", "scripts*", "finetune*", "dags*"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers -ra"
+testpaths = ["tests"]
+markers = [
+    "unit: fast unit tests",
+    "integration: needs real components",
+    "security: tenant isolation and prompt-injection regression tests",
+    "eval: evaluation harness tests",
+    "slow: slow tests",
+    "failure_repro: reproduces the stale-retry lineage failure (naive xfail vs fixed pass)",
+    "ollama: needs a running Ollama with the models pulled",
+    "gpu: needs a CUDA GPU",
+    "airflow: needs Apache Airflow installed",
+    "qdrant: needs a Qdrant server",
+]
