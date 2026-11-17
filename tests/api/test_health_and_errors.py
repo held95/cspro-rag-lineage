@@ -1,4 +1,4 @@
-import pytest
+﻿import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
@@ -9,7 +9,7 @@ pytestmark = pytest.mark.unit
 
 @pytest.fixture
 def client(tmp_path):
-    settings = Settings(ledger_path=str(tmp_path / "ledger.db"), max_body_bytes=1024)
+    settings = Settings(ledger_path=str(tmp_path / "ledger.db"), max_body_bytes=1024, vector_path=None, embed_backend="hash")
     with TestClient(create_app(settings), raise_server_exceptions=False) as c:
         yield c
 
@@ -47,7 +47,7 @@ def test_api10_405_uses_error_envelope(client):
 
 
 def test_api10_500_hides_internals(tmp_path):
-    settings = Settings(ledger_path=str(tmp_path / "l.db"))
+    settings = Settings(ledger_path=str(tmp_path / "l.db"), vector_path=None, embed_backend="hash")
     app = create_app(settings)
 
     @app.get("/boom")
@@ -70,7 +70,7 @@ def test_api04b_oversize_content_length_is_413(client):
 
 
 def test_api04b_oversize_chunked_body_is_413(tmp_path):
-    settings = Settings(ledger_path=str(tmp_path / "l.db"), max_body_bytes=1024)
+    settings = Settings(ledger_path=str(tmp_path / "l.db"), max_body_bytes=1024, vector_path=None, embed_backend="hash")
     app = create_app(settings)
 
     @app.post("/echo")
@@ -84,3 +84,4 @@ def test_api04b_oversize_chunked_body_is_413(tmp_path):
     with TestClient(app, raise_server_exceptions=False) as c:
         r = c.post("/echo", content=gen(), headers={"Content-Type": "application/json"})
     assert r.status_code == 413
+
