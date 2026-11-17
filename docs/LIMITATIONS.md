@@ -30,6 +30,7 @@
 ## Security scope
 - Isolation is tested against scripted adversaries ("obedient" fake LLM), not against a real model's behaviour.
 - `SEC-24` removes defences with test-only wrappers to show the tests can fail; it demonstrates the tests, not production hardening.
+- `/docs`, `/redoc` and `/openapi.json` are served without authentication (FastAPI defaults; informational). No rate limiting.
 - API keys are static, hashed in config; no rotation, expiry or per-key rate limit.
 - Qdrant runs in local mode (embedded); payload indexes and `is_tenant` indexing have no effect there.
 - SQLite ledger: single node, one writer at a time (`BEGIN IMMEDIATE`).
