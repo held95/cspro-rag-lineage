@@ -15,7 +15,7 @@ Read `docs/LIMITATIONS.md` and `docs/AI_DISCLOSURE.md` before judging the result
 | Naive pipeline resurrects a stale version, the fixed one does not | XFAIL (naive) / PASS (fixed) | `pytest -m failure_repro -v` |
 | Tenant isolation, ACL, uniform 404 / abstention, prompt-injection containment | 23 tests | `pytest -m security -v` |
 | Controls really matter: with them off the canary leaks | `SEC-24` tests | `pytest tests/security/test_injection.py -k sec24 -v` |
-| Whole suite (main venv) | 90 passed, 6 skipped, 2 xfailed | `pytest -q` |
+| Whole suite (main venv) | see `pytest -q` (146 passed, 6 skipped, 2 xfailed + 8 live `-m ollama` tests when Ollama is up) | `pytest -q` |
 | QLoRA run on Qwen3-1.7B (RTX 3050, 6 GB) | `finetune/results/baseline_vs_adapted.md` (script-generated) | see "Fine-tune" |
 
 The 6 skipped tests need the training venv (`transformers`, `pyyaml`) or a GPU (`-m gpu`).
@@ -45,12 +45,21 @@ Auth: `X-API-Key`. The tenant, groups and scopes come **only** from the key reco
 (`Settings.api_keys`: `sha256(key) -> KeyRecord`); a tenant in the body or in a header is rejected or ignored.
 Errors share one envelope: `{"error": {"code", "message", "details", "request_id"}}`.
 
-## Running against real Ollama — NOT EXECUTED
+## Running against real Ollama
 
-The app defaults to Ollama (`qwen3:4b-instruct-2507-q4_K_M`, `nomic-embed-text`; configurable with
-`CSPRO_*` environment variables, see `app/core/config.py`). These models are pulled on the author's machine,
-but **no live `/ask` run against Ollama has been executed**, there is no `scripts/seed_demo.py`, and the
-`LLM-02` live smoke test does not exist yet. Everything above was verified with fakes.
+The app defaults to Ollama (`qwen3:4b-instruct-2507-q4_K_M`, `nomic-embed-text`; configurable with `CSPRO_*`
+environment variables, see `app/core/config.py`).
+
+```
+python -m scripts.seed_demo --embed ollama      # writes .env.local (only sha256 of the keys) and ingests the records; prints keys once
+python -m uvicorn app.main:create_app --factory
+python -m pytest -m ollama -v                   # live smoke (skips when Ollama is not reachable)
+```
+
+Executed on the author's machine (see `docs/LIVE_RUN.md`): a first live run abstained on every question because the JSON
+Schema had no `required` keys; this was fixed and re-measured (9 answered / 3 correctly abstained of 12). Samples are tiny
+(12-30 questions, one run). Not reliable yet: conflict detection (only flagged when the question invites it) and a ticket
+that contradicts the current policy.
 
 ## Fine-tune
 

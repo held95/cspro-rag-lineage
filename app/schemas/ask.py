@@ -34,6 +34,10 @@ def answer_json_schema(aliases: list[str]) -> dict:
     """JSON Schema handed to Ollama ``format`` — source_id is restricted to this request's aliases."""
     schema = GroundedAnswer.model_json_schema()
     schema["$defs"]["LLMCitation"]["properties"]["source_id"] = {"type": "string", "enum": aliases}
+    # The pydantic fields have defaults, so the generated schema has no "required": a constrained
+    # model may then omit `citations` and every answer is abstained as unverifiable. Force all keys.
+    schema["required"] = ["answer", "abstain", "conflict", "citations"]
+    schema["$defs"]["LLMCitation"]["required"] = ["source_id", "quote"]
     return schema
 
 
