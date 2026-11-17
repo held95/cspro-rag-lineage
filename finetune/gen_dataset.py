@@ -86,7 +86,9 @@ def make_example(ctx: _Ctx, fam: Family, ex_type: str, index: int) -> dict:
     answer_text = ""
     conflict = False
 
-    if ex_type in ("answerable", "injection") and not (ex_type == "injection" and rng.random() < 0.5):
+    # injection items: half still contain the real answer, half must be abstained on
+    has_answer = ex_type == "answerable" or (ex_type == "injection" and rng.random() < 0.5)
+    if has_answer:
         v = ctx.value(fam)
         values.append(v)
         main = _doc(ctx, fam, org, v)

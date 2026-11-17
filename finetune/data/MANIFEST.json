@@ -1,0 +1,43 @@
+{
+  "seed": 42,
+  "split_families": {
+    "train": [
+      "refund_policy",
+      "shipping_sla",
+      "password_reset",
+      "invoice_dispute",
+      "outage_runbook",
+      "warranty",
+      "data_retention",
+      "onboarding_checklist"
+    ],
+    "val": [
+      "escalation_matrix",
+      "api_rate_limits"
+    ],
+    "heldout": [
+      "subscription_cancellation",
+      "loyalty_points",
+      "device_lending",
+      "session_timeout"
+    ]
+  },
+  "files": {
+    "train.jsonl": {
+      "count": 200,
+      "sha256": "6696aeb3d7469b61c14ab9246c7874739af652a0010ff611e60a7f993cd0aead"
+    },
+    "val.jsonl": {
+      "count": 40,
+      "sha256": "d5a65664189305f6d6ab7ef148b6e1ae478125c5f03b08335cb844d6b16d800f"
+    },
+    "heldout.jsonl": {
+      "count": 60,
+      "sha256": "ce715a436216320906623163b64996c9919951577b17b3694ea72dfaae26849c"
+    },
+    "heldout_ood_handwritten.jsonl": {
+      "count": 15,
+      "sha256": "eddcce5dc104695f0ccf069108cd1e06fbfa9144ce50ca120e2d83090501d89d"
+    }
+  }
+}
