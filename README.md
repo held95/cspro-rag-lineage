@@ -16,7 +16,7 @@ Read `docs/LIMITATIONS.md` and `docs/AI_DISCLOSURE.md` before judging the result
 | Naive pipeline resurrects a stale version, the fixed one does not | XFAIL (naive) / PASS (fixed) | `pytest -m failure_repro -v` |
 | Tenant isolation, ACL, uniform 404 / abstention, prompt-injection and Unicode-smuggling containment | 27 tests | `pytest -m security -v` |
 | Controls really matter: with them off the canary leaks | `SEC-24` tests | `pytest tests/security/test_injection.py -k sec24 -v` |
-| Whole suite (main venv) | 158 passed, 6 skipped, 2 xfailed (the 9 `-m ollama` live tests run when Ollama is up, and skip otherwise) | `pytest -q` |
+| Whole suite (main venv) | 168 passed, 6 skipped, 2 xfailed (the 9 `-m ollama` live tests run when Ollama is up, and skip otherwise) | `pytest -q` |
 | QLoRA run on Qwen3-1.7B (RTX 3050, 6 GB) | `finetune/results/baseline_vs_adapted.md` (script-generated) | see "Fine-tune" |
 
 The 6 skipped tests need the training venv (`transformers`, `pyyaml`) or a GPU (`-m gpu`).
