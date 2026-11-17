@@ -81,11 +81,23 @@ def main(argv: list[str] | None = None) -> int:
     keys = generate_keys()
     for path in (Path(a.ledger_path).parent, Path(a.vector_path).parent):
         path.mkdir(parents=True, exist_ok=True)
+
+    # Ingest FIRST, with settings built in memory: if this fails (e.g. the Qdrant folder is locked by a running
+    # server), the existing env file is left untouched and no key is lost or invalidated.
+    hashed = {hashlib.sha256(k.encode()).hexdigest(): IDENTITIES[n] for n, k in keys.items()}
+    settings = Settings(_env_file=None, embed_backend=a.embed, ledger_path=a.ledger_path,
+                        vector_path=a.vector_path, api_keys=hashed)
+    try:
+        count = ingest_all(settings)
+    except RuntimeError as exc:
+        if "already accessed by another instance" in str(exc):
+            print(f"ERROR: {a.vector_path} is in use by another process (probably the running uvicorn server). "
+                  "Stop the server (Ctrl+C in its window), run the seed again, then start the server. "
+                  f"{env_file} was NOT changed.", file=sys.stderr)
+            return 2
+        raise
+
     env_file.write_text(render_env(keys, a.embed, a.ledger_path, a.vector_path), encoding="utf-8")
-
-    settings = Settings(_env_file=str(env_file))
-    count = ingest_all(settings)
-
     print(f"Wrote {env_file}; ingested {count} records (embed={a.embed}).")
     print("API keys (shown ONCE, not stored in plaintext):")
     for name, key in keys.items():

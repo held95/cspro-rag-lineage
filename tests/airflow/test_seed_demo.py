@@ -48,3 +48,20 @@ def test_seed_refuses_to_overwrite_without_force(tmp_path, capsys):
     assert env.read_text("utf-8") == "KEEP=me\n"
     assert seed_demo.main([*argv, "--force"]) == 0
     assert "CSPRO_API_KEYS" in env.read_text("utf-8")
+
+
+def test_failed_ingestion_leaves_env_file_untouched_and_prints_no_keys(tmp_path, capsys, monkeypatch):
+    """Regression: the seed used to overwrite the env file BEFORE ingesting. A locked Qdrant folder (server running)
+    then left new, never-printed key hashes behind and invalidated the keys the user already had."""
+    env, argv = _run(tmp_path)
+    env.write_text("KEEP=me\n", encoding="utf-8")
+
+    def locked(_settings):
+        raise RuntimeError("Storage folder var/qdrant is already accessed by another instance of Qdrant client.")
+
+    monkeypatch.setattr(seed_demo, "ingest_all", locked)
+    assert seed_demo.main([*argv, "--force"]) == 2
+    captured = capsys.readouterr()
+    assert env.read_text("utf-8") == "KEEP=me\n"
+    assert "Stop the server" in captured.err
+    assert "alpha-admin" not in captured.out
