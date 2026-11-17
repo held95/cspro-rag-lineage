@@ -6,7 +6,8 @@ superseded document" failure, enforces **tenant isolation in application code**,
 baseline-vs-adapted evaluation.
 
 Read `docs/LIMITATIONS.md` and `docs/AI_DISCLOSURE.md` before judging the results.
-`docs/WALKTHROUGH.md` maps every behaviour to a file, a test and a command.
+`docs/WALKTHROUGH.md` maps every behaviour to a file, a test and a command; `docs/ARCHITECTURE.md` is the one-page design;
+`docs/LIVE_RUN.md` and `docs/RETRIEVAL_EVAL.md` hold the (small) real-model measurements; `docs/SUBMISSION_CHECKLIST.md` the recording script.
 
 ## What is verified (and how)
 
@@ -60,6 +61,11 @@ Executed on the author's machine (see `docs/LIVE_RUN.md`): a first live run abst
 Schema had no `required` keys; this was fixed and re-measured (9 answered / 3 correctly abstained of 12). Samples are tiny
 (12-30 questions, one run). Not reliable yet: conflict detection (only flagged when the question invites it) and a ticket
 that contradicts the current policy.
+
+## Models and licences
+LLM `qwen3:4b-instruct-2507-q4_K_M` (fallback `qwen3:1.7b-q4_K_M`, also the fine-tune base `Qwen/Qwen3-1.7B`) and embedder
+`nomic-embed-text` run locally through Ollama. The research notes (`docs/research/`) list them as Apache-2.0, but that was
+**not re-verified against the model cards**; check the licences before any reuse. Fine-tune pins: `requirements-train.txt`.
 
 ## Fine-tune
 

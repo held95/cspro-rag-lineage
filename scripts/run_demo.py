@@ -1,10 +1,10 @@
 """Recording-friendly demo: prints a readable transcript of the behaviours the assessment looks for.
 
-    python -m scripts.run_demo [--embed ollama|hash] [--llm ollama|fake]
+    python -m scripts.run_demo [--embed ollama|hash]
 
 The app runs in-process (FastAPI TestClient) with a temporary ledger and in-memory Qdrant, so nothing is written to
-the repository. With the default `--embed ollama --llm ollama` it talks to the local Ollama (models must be pulled);
-`--embed hash --llm fake` runs without Ollama but the answers then come from a scripted fake, not a real model.
+the repository. With the default `--embed ollama` it talks to the local Ollama (models must be pulled). The LLM is always Ollama (the fake LLM exists only in tests);
+`--embed hash` only replaces the embedder, which gives poor retrieval quality.
 """
 from __future__ import annotations
 
@@ -44,12 +44,10 @@ def show(label: str, r) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--embed", choices=["ollama", "hash"], default="ollama")
-    ap.add_argument("--llm", choices=["ollama", "fake"], default="ollama")
     a = ap.parse_args()
 
     tmp = Path(tempfile.mkdtemp(prefix="cspro_demo_"))
     settings = Settings(ledger_path=str(tmp / "ledger.db"), vector_path=None, embed_backend=a.embed,
-                        llm_backend=a.llm,
                         api_keys={hashlib.sha256(k.encode()).hexdigest(): v for k, v in KEYS.items()})
     container = build_container(settings)
     client = TestClient(create_app(settings, container), raise_server_exceptions=False)
@@ -63,7 +61,7 @@ def main() -> int:
     def ask(key, q):
         return client.post("/ask", json={"question": q}, headers=h(key))
 
-    title(f"0. Health  (embed={a.embed}, llm={a.llm}, model={settings.llm_model})")
+    title(f"0. Health  (embed={a.embed}, llm=ollama, model={settings.llm_model})")
     show("GET /health", client.get("/health"))
 
     title("1. The lineage failure: a retry replays an OLD version after a newer one was accepted")
