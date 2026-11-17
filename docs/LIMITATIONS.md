@@ -4,8 +4,8 @@
 - **No live Ollama run.** `/ask` was only exercised with scripted fake LLMs and a hash embedder. The live smoke
   (`LLM-02`), the retrieval threshold calibration on real embeddings (`Settings.min_score = 0.45` is an untuned default;
   tests use 0.05 with the hash embedder) and any real-model quality claim are missing.
-- **No Airflow DAG** (`dags/ingest_dag.py` does not exist) and no tests for it (`LIN-03/04/05`). The lineage fix is shown
-  by the in-process naive-vs-fixed test (`LIN-01/02`) and the ingestion tests, not by a scheduler.
+- **No Airflow DAG** (`dags/ingest_dag.py` does not exist) and no DAG tests (`LIN-04/05`). The lineage fix is shown by the in-process
+  naive-vs-fixed test (`LIN-01/02`), the ingestion tests and the API replay of a stale retry (`LIN-03`), not by a scheduler.
 - **No `scripts/seed_demo.py`** (`config.py` still mentions it) and no demo recording.
 - **Not built, as the 24 h plan allows:** DELETE/tombstones, reconcile job, rate limiting, Hypothesis tests.
 - **Security tests not written:** `SEC-16` (output canary tripwire; needs an app feature that does not exist), `SEC-17`
