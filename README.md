@@ -67,24 +67,43 @@ LLM `qwen3:4b-instruct-2507-q4_K_M` (fallback `qwen3:1.7b-q4_K_M`, also the fine
 `nomic-embed-text` run locally through Ollama. The research notes (`docs/research/`) list them as Apache-2.0, but that was
 **not re-verified against the model cards**; check the licences before any reuse. Fine-tune pins: `requirements-train.txt`.
 
-## Fine-tune
+## Fine-tune (QLoRA, Qwen3-1.7B)
 
-Pipeline: `finetune.gen_dataset` -> `finetune.check_leakage` -> `finetune.train` -> `finetune.generate` +
-`finetune.eval` per arm -> `finetune.report`. Training needs the separate train venv (`.venv-train`: torch cu128,
-transformers 5, peft, trl, bitsandbytes) and a free GPU.
+Datasets are synthetic and generated deterministically (seed 42): `finetune/data/{train,val,heldout,heldout_ood_handwritten}.jsonl`
+(200 / 40 / 60 / 15 items; scenario families are disjoint between splits, `MANIFEST.json` has the SHA-256 of every file).
 
 ```
+python -m finetune.gen_dataset --seed 42        # regenerate the data (optional; the files are committed)
+python -m finetune.check_leakage                # train vs held-out overlap check (must print OK)
+
+# training venv: see requirements-train.txt (torch cu128 + transformers 5, peft, trl, bitsandbytes), NVIDIA GPU
 .venv-train\Scripts\python -m finetune.train --config finetune/configs/qlora_qwen3_1p7b.yaml --output-dir finetune/outputs/full
+#   add --max-steps 20 for the smoke run
+
+# one arm = generate + score; "base" has no adapter, "adapted" loads it. Repeat for heldout and ood.
+.venv-train\Scripts\python -m finetune.generate --config finetune/configs/qlora_qwen3_1p7b.yaml --data finetune/data/heldout.jsonl --out finetune/outputs/preds/adapted__heldout.jsonl --adapter finetune/outputs/full/adapter
+.venv-train\Scripts\python -m finetune.eval --preds finetune/outputs/preds/adapted__heldout.jsonl --gold finetune/data/heldout.jsonl --out finetune/results/adapted__heldout.json
+python -m finetune.report --run-meta finetune/results/run_meta.json     # writes finetune/results/baseline_vs_adapted.md
 ```
 
-Executed: 75 steps, 1081 s, 2.2 GB peak VRAM. Train loss ended near 0.0007 while validation loss stayed
-around 0.085-0.093, i.e. the model memorised the templated training data; judge it by the held-out tables, not by the
-loss. The adapter itself is git-ignored (`finetune/outputs/`).
+For the baseline drop `--adapter` and name the files `base__heldout` / `base__ood`; the OOD set is
+`finetune/data/heldout_ood_handwritten.jsonl` (files `*__ood`).
+
+**Executed on 2026-11-17** (RTX 3050 6 GB): 75 steps, 1081 s, 2.2 GB peak VRAM; exact versions and settings are in
+`finetune/results/run_meta.json`. Train loss ended near 0.0007 while validation loss stayed around 0.085-0.093, i.e. the
+model memorised the templated training data; judge it by the held-out tables in `finetune/results/baseline_vs_adapted.md`,
+not by the loss. Only two arms were run (base zero-shot and adapted); few-shot was not.
+
+**Checkpoint.** The LoRA adapter (34.9 MB) is git-ignored (`finetune/outputs/`), so a fresh clone does not contain it: re-create it
+with the training command above (about 18 minutes on the RTX 3050; the result is not guaranteed to be bit-identical).
+The run reported here produced `adapter_model.safetensors` with SHA-256
+`0e0f0afd2bcb998f0447b14d2147c8ff76c5cf9cc658647ec4b255e14cd3cbd3`. Base model: `Qwen/Qwen3-1.7B` at the commit pinned in the config.
+To load it: `PeftModel.from_pretrained(base_model, "finetune/outputs/full/adapter")` (see `finetune/generate.py : load_model`).
 
 Result summary (n=60 templated held-out, n=15 hand-written OOD, wide confidence intervals): the adapted model stops
 over-abstaining (0.93 -> 0.00 held-out, 1.00 -> 0.09 OOD) and detects conflicts (F1 0 -> 0.77 / 0.75), while injection
 compliance rose from 0 to 0.08 on the held-out set (CI [0, 0.27]) and unconstrained schema validity dipped slightly.
-The adapter was **not** served through Ollama; the app never uses it.
+The adapter was **not** served through Ollama; the running app does not use it.
 
 ## Layout
 
