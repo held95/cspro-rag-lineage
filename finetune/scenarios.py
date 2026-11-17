@@ -22,7 +22,7 @@ class Family:
     faq: str           # the same fact restated, used as an optional second citation
     claim: str         # short claim used inside the gold answer ("refunds ... {v} days")
     filler: tuple[str, ...]  # on-topic sentences that do NOT contain the answer
-    scale: int = 1     # fact value = base number from the split's pool * scale
+
 
 
 FAMILIES: tuple[Family, ...] = (
@@ -53,7 +53,6 @@ FAMILIES: tuple[Family, ...] = (
         "a password reset link is valid for {v} minutes",
         ("Reset links are sent only to the verified account e-mail address.",
          "Support agents must never ask a customer for their current password."),
-        scale=5,
     ),
     Family(
         "invoice_dispute", "policy", "{org} Invoice Dispute Process",
@@ -90,7 +89,6 @@ FAMILIES: tuple[Family, ...] = (
         "deleted customer records are purged after {v} days",
         ("Backups are encrypted at rest.",
          "Audit logs follow a separate retention rule."),
-        scale=2,
     ),
     Family(
         "onboarding_checklist", "checklist", "{org} New Customer Onboarding",
@@ -119,7 +117,6 @@ FAMILIES: tuple[Family, ...] = (
         "the public API allows {v} requests per minute per key",
         ("Rate limit headers are returned on every response.",
          "Batch endpoints count as a single request."),
-        scale=50,
     ),
     # ---------------- held-out families ----------------
     Family(
@@ -168,7 +165,7 @@ SPLIT_FAMILIES: dict[str, tuple[str, ...]] = {
                 "session_timeout"),
 }
 
-# Disjoint base-number pools; fact value = base * family.scale.
+# Disjoint fact-value pools (numbers never repeat across splits).
 NUMBER_POOLS: dict[str, range] = {
     "train": range(3, 31),
     "val": range(31, 46),

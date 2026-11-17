@@ -42,7 +42,7 @@ class _Ctx:
         return f"{self.rng.choice(scenarios.ORG_PREFIXES[self.split])} {self.rng.choice(scenarios.ORG_SUFFIXES)}"
 
     def value(self, fam: Family, exclude: int | None = None) -> int:
-        pool = [b * fam.scale for b in scenarios.NUMBER_POOLS[self.split] if b * fam.scale != exclude]
+        pool = [v for v in scenarios.NUMBER_POOLS[self.split] if v != exclude]
         return self.rng.choice(pool)
 
 
@@ -59,7 +59,7 @@ def _distractors(ctx: _Ctx, fam: Family, org: str, k: int) -> list[dict]:
     """Documents from OTHER families of the same split (never leak across splits)."""
     others = [f for f in scenarios.FAMILIES
               if f.name in scenarios.SPLIT_FAMILIES[ctx.split] and f.name != fam.name]
-    return [_doc(ctx, f, org, ctx.value(f)) for f in ctx.rng.sample(others, k)]
+    return [_doc(ctx, f, org, ctx.value(f)) for f in ctx.rng.sample(others, min(k, len(others)))]
 
 
 def _ticket(ctx: _Ctx, canary: str) -> tuple[dict, str]:
@@ -120,10 +120,12 @@ def make_example(ctx: _Ctx, fam: Family, ex_type: str, index: int) -> dict:
     alias = {d["doc_id"]: f"S{i + 1}" for i, d in enumerate(docs)}
 
     citations = [_cite(alias, d, q) for d, q in citing]
-    if conflict:
-        s1, s2 = citations[0].source_id, citations[1].source_id
-        answer_text = (f"The sources conflict: {s1} says {fam.claim.format(v=values[0])}, "
-                       f"while {s2} says {fam.claim.format(v=values[1])}.")
+    if conflict:  # list the lower alias first so the answer reads S1 ... S2 ...
+        pairs = sorted(zip(citations, values), key=lambda cv: cv[0].source_id)
+        citations = [c for c, _ in pairs]
+        (c1, v1), (c2, v2) = pairs
+        answer_text = (f"The sources conflict: {c1.source_id} says {fam.claim.format(v=v1)}, "
+                       f"while {c2.source_id} says {fam.claim.format(v=v2)}.")
     gold = GroundedAnswer(answer=answer_text, abstain=not citations, conflict=conflict,
                           citations=citations)
 

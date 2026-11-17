@@ -1,0 +1,27 @@
+# QLoRA fine-tune of Qwen3-1.7B for grounded JSON answers (RTX 3050 Laptop, 6 GB).
+model:
+  name: Qwen/Qwen3-1.7B
+  revision: 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e   # pinned HF commit
+data:
+  train_path: finetune/data/train.jsonl
+  val_path: finetune/data/val.jsonl
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+train:
+  max_length: 1536
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  num_train_epochs: 3
+  learning_rate: 0.0002
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.05
+  optim: paged_adamw_8bit
+  seed: 42
+  logging_steps: 5
+  eval_steps: 25
+  save_steps: 25
+  gradient_checkpointing: true
+output_dir: finetune/outputs
