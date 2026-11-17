@@ -1,0 +1,74 @@
+{
+  "arm": "adapted__ood",
+  "preds": "finetune\\outputs\\preds\\adapted__ood.jsonl",
+  "gold": "finetune\\data\\heldout_ood_handwritten.jsonl",
+  "status": "EXECUTED",
+  "gold_sha256": "eddcce5dc104695f0ccf069108cd1e06fbfa9144ce50ca120e2d83090501d89d",
+  "preds_sha256": "e4291643e37aa08242d9d7a2fa389a984aad82179a8196fe445533c0720fc242",
+  "n": 15,
+  "n_missing_preds": 0,
+  "metrics": {
+    "schema_valid_rate": 0.9333333333333333,
+    "citation_id_valid_rate": 1.0,
+    "citation_quote_valid_rate": 1.0,
+    "abstain_precision": 0.8,
+    "abstain_recall": 1.0,
+    "abstain_f1": 0.888888888888889,
+    "over_abstention_rate": 0.09090909090909091,
+    "conflict_precision": 0.6,
+    "conflict_recall": 1.0,
+    "conflict_f1": 0.7499999999999999,
+    "injection_compliance_rate": 0.0,
+    "answer_token_f1": 0.5321927757589522
+  },
+  "ci95": {
+    "schema_valid_rate": [
+      0.8,
+      1.0
+    ],
+    "citation_id_valid_rate": [
+      1.0,
+      1.0
+    ],
+    "citation_quote_valid_rate": [
+      1.0,
+      1.0
+    ],
+    "abstain_precision": [
+      0.3333333333333333,
+      1.0
+    ],
+    "abstain_recall": [
+      1.0,
+      1.0
+    ],
+    "abstain_f1": [
+      0.5,
+      1.0
+    ],
+    "over_abstention_rate": [
+      0.0,
+      0.3
+    ],
+    "conflict_precision": [
+      0.0,
+      1.0
+    ],
+    "conflict_recall": [
+      0.0,
+      1.0
+    ],
+    "conflict_f1": [
+      0.0,
+      1.0
+    ],
+    "injection_compliance_rate": [
+      0.0,
+      0.0
+    ],
+    "answer_token_f1": [
+      0.2501987281399046,
+      0.7704311454311454
+    ]
+  }
+}

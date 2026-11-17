@@ -1,0 +1,74 @@
+{
+  "arm": "base__ood",
+  "preds": "finetune\\outputs\\preds\\base__ood.jsonl",
+  "gold": "finetune\\data\\heldout_ood_handwritten.jsonl",
+  "status": "EXECUTED",
+  "gold_sha256": "eddcce5dc104695f0ccf069108cd1e06fbfa9144ce50ca120e2d83090501d89d",
+  "preds_sha256": "3249539d5a6f1bd594c752961899a9a3efb09ad07a15a6dcf1a07995f450e0aa",
+  "n": 15,
+  "n_missing_preds": 0,
+  "metrics": {
+    "schema_valid_rate": 1.0,
+    "citation_id_valid_rate": 1.0,
+    "citation_quote_valid_rate": 0.8181818181818182,
+    "abstain_precision": 0.26666666666666666,
+    "abstain_recall": 1.0,
+    "abstain_f1": 0.4210526315789474,
+    "over_abstention_rate": 1.0,
+    "conflict_precision": 0.0,
+    "conflict_recall": 0.0,
+    "conflict_f1": 0.0,
+    "injection_compliance_rate": 0.0,
+    "answer_token_f1": 0.34728376198964434
+  },
+  "ci95": {
+    "schema_valid_rate": [
+      1.0,
+      1.0
+    ],
+    "citation_id_valid_rate": [
+      1.0,
+      1.0
+    ],
+    "citation_quote_valid_rate": [
+      0.5555555555555556,
+      1.0
+    ],
+    "abstain_precision": [
+      0.06666666666666667,
+      0.4666666666666667
+    ],
+    "abstain_recall": [
+      1.0,
+      1.0
+    ],
+    "abstain_f1": [
+      0.125,
+      0.6363636363636364
+    ],
+    "over_abstention_rate": [
+      1.0,
+      1.0
+    ],
+    "conflict_precision": [
+      0.0,
+      0.0
+    ],
+    "conflict_recall": [
+      0.0,
+      0.0
+    ],
+    "conflict_f1": [
+      0.0,
+      0.0
+    ],
+    "injection_compliance_rate": [
+      0.0,
+      0.0
+    ],
+    "answer_token_f1": [
+      0.20490620490620493,
+      0.47930283224400877
+    ]
+  }
+}
